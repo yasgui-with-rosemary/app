@@ -1,2 +1,39 @@
-# app
-Yasgui with Rosemary plugin. See http://yasgui-with-rosemary.github.io/docs for more info.
+
+
+# Rosemary
+---
+
+> What if developers could use [Linked Data](https://www.w3.org/DesignIssues/LinkedData) like they would any [RESTful API](https://www.geeksforgeeks.org/rest-api-introduction/), no Linked Data or [SPARQL](https://sparql.dev/) knowledge needed? Now they can!
+
+[Rosemary](http://github.com/yasgui-with-rosemary/app) is a plugin for [Yasgui](https://yasgui.triply.cc/) facilitating creation of SPARQL queries without requiring knowledge of SPARQL.
+
+**Recipe:** use [rosemary](http://github.com/yasgui-with-rosemary/app) to construct queries for retrieving relevant data from public Linked Data stores, publish the queries on [Github](http://github.com) using [grlc publisher](https://github.com/CLARIAH/yasgui-grlc-publisher) and convert them to [RESTful APIs](https://www.geeksforgeeks.org/rest-api-introduction/) with [grlc](http://grlc.io).
+
+#### Useful links
+---
+[What is Linked Data](https://rubenverborgh.github.io/WebFundamentals/semantic-web/)?
+
+[What is SPARQL](https://www.w3.org/TR/sparql11-query/)?
+
+[Yasgui](https://yasgui.triply.cc/) SPARQL editor ([Triply](https://triply.cc/en-US)):
+1. [Use it online](https://yasgui.triply.cc/)
+2. [Documentation](https://triply.cc/docs/yasgui/)
+
+[Rosemary](http://github.com/yasgui-with-rosemary/app):
+1. [Use it online](http://yasgui-with-rosemary.github.io/app)
+2. [Documentation](http://yasgui-with-rosemary.github.io/docs)
+
+#### Deploy locally (requires [Docker](https://www.docker.com/))
+---
+    docker compose up
+
+#### License
+Copyright (2025) [Kody Moodley, The Netherlands eScience Center](https://www.esciencecenter.nl/team/dr-kody-moodley/)
+
+This project is licensed under the [MIT License](LICENSE).
+
+#### Credits
+---
+Thank you to [Richard Zijdeman](https://www.clariah.nl/nl/personen/richard-zijdeman) and [Carlos Martinez-Ortiz](https://www.esciencecenter.nl/team/dr-carlos-martinez-ortiz/) for input and feedback on the design of [rosemary](http://github/yasgui-with-rosemary/app), and to [CLARIAH](https://www.clariah.nl/) for funding the development.
+
+

@@ -1,0 +1,36 @@
+# This CITATION.cff file was generated with cffinit.
+# Visit https://bit.ly/cffinit to generate yours today!
+
+cff-version: 1.2.0
+title: rosemary
+message: >-
+  If you use this software, please cite it using the
+  metadata from this file.
+type: software
+authors:
+  - given-names: Kody
+    family-names: Moodley
+    email: k.moodley@esciencecenter.nl
+    affiliation: Netherlands eScience Center
+    orcid: 'https://orcid.org/0000-0001-5666-1658'
+identifiers:
+  - type: doi
+    value: 10.5281/zenodo.14624851
+    description: Zenodo archived release v0.0.1-alpha
+repository-code: >-
+  https://github.com/yasgui-with-rosemary/app
+url: >-
+  https://research-software-directory.org/projects/enhancing-the-sustainability-of-grlc
+abstract: >-
+  rosemary is a plugin for YASGUI (Yet Another SPARQL GUI) which facilitates the creation of SPARQL queries without requiring knowledge of the language
+keywords:
+  - SPARQL
+  - RDF
+  - Linked Data
+  - Autocompletion
+  - Javascript
+  - GRLC
+license: MIT
+commit: c0627ee
+version: 0.0.1-alpha
+date-released: '2025-01-09'
