@@ -1,0 +1,10 @@
+version: '2'
+
+services:
+  yasgui:
+    build:
+      context: ./
+      dockerfile: Dockerfile
+    container_name: yasgui-with-rosemary
+    ports:
+      - 8091:80
