@@ -28,9 +28,11 @@
 1. [Use it online](http://yasgui-with-rosemary.github.io/app)
 2. [Documentation](http://yasgui-with-rosemary.github.io/docs)
 
-#### Deploy locally (requires [Docker](https://www.docker.com/))
+#### Deploy locally (requires [Docker](https://www.docker.com/))*
 ---
     docker compose up
+
+\* rosemary runs in the browser so you can also run it locally without Docker by opening [index.html](https://github.com/yasgui-with-rosemary/app/blob/main/index.html) in your browser ([Chrome](https://www.google.com/chrome/) **recommended**)
 
 #### Scope
 Rosemary is a proof of concept. It currently does not support the full expressivity of SPARQL (only a restricted subset of [SELECT](https://www.w3.org/TR/sparql11-query/#select) queries are currently supported for example) and that is not the intention. It is a tool which can be useful for:
