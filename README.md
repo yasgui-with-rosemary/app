@@ -8,7 +8,7 @@
 <img src="img/rosemary-logo-v1.png" alt="rosemary logo" height="250">
 </div>
 
-> What if developers could use [Linked Data](https://www.w3.org/DesignIssues/LinkedData) like they would any [RESTful API](https://www.geeksforgeeks.org/rest-api-introduction/), no Linked Data or [SPARQL](https://sparql.dev/) knowledge needed? Now they can!
+> What if developers and researchers could interact with [Linked Data](https://www.w3.org/DesignIssues/LinkedData) in their applications and analyses as they would any [RESTful API](https://www.geeksforgeeks.org/rest-api-introduction/), no Linked Data or [SPARQL](https://sparql.dev/) knowledge required?
 
 [Rosemary](http://github.com/yasgui-with-rosemary/app) is a plugin for [Yasgui](https://yasgui.triply.cc/) facilitating creation of SPARQL queries without requiring knowledge of SPARQL.
 
