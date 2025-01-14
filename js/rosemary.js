@@ -1,5 +1,4 @@
 const yasgui = new Yasgui(document.getElementById("yasgui"));
-// var rosemaryButtonClicked = false;
 let gui = document.createElement('div');
 
 // get all tabs
@@ -76,15 +75,17 @@ let newItems = [];
 let regexFilterCount = 1;
 let showAttributeCount = 1;
 
+function setupFilterValueChangedListenerHandler(activeTabID){
+    $(document).on('change', '.predicate, .min-val, .max-val, .regex, .object, .datatype, #limit-val-'+activeTabID, function() {
+        updateSparqlQuery();
+        newItems = [];                                                  // Refresh dropdown items
+    });
+}
 document.addEventListener('DOMContentLoaded', function() {
     var activeTab = document.querySelector('.tabPanel.active');
     console.log('active tab id: ', activeTab.id);
-    
-    $(document).on('change', '.predicate, .min-val, .max-val, .regex, .object, .datatype, #limit-val-'+activeTab.id, function() {
-        updateSparqlQuery();
-        newItems = [];                                                  // Refresh dropdown items
 
-    });
+    setupFilterValueChangedListenerHandler(activeTab.id);
 
     $(document).on('input', '.predicate, .object, #show-attribute', function() {
         newItems = [];                                                  // Refresh dropdown items

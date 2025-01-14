@@ -328,11 +328,15 @@ button:hover {
 .ui-autocomplete {
     z-index: 1050;
     max-height: 200px;
-    max-width: 100px;
+    min-width: 220px;  /* Match the input width */
+    width: auto !important; /* Override any inline styles */
     background-color: #ffffff;
-    overflow-y: auto;
+    overflow-y: auto !important; /* Force scrolling */
     overflow-x: hidden;
-    padding-right: 20px;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    padding: 0;
 }
 
 .ui-menu-item {
@@ -340,13 +344,47 @@ button:hover {
     background-color: #ffffff;
     padding: 8px 12px;
     cursor: pointer;
+    border-bottom: 1px solid #f5f5f5;
+}
+
+.ui-menu-item:last-child {
+    border-bottom: none;
 }
 
 .ui-state-active {
     z-index: 1050;
-    background-color: #ffffff;
+    background-color: #f8f9fa;
     color: black;
 }
+
+/* Ensure proper scrolling for dropdown container */
+.ui-menu {
+    max-height: 200px !important;
+    overflow-y: auto !important;
+}
+
+/* .ui-autocomplete {
+    z-index: 1050;
+    max-height: 200px;
+    max-width: 100px;
+    background-color: #ffffff;
+    overflow-y: auto;
+    overflow-x: hidden;
+    padding-right: 20px;
+} */
+
+/* .ui-menu-item {
+    z-index: 1050;
+    background-color: #ffffff;
+    padding: 8px 12px;
+    cursor: pointer;
+} */
+
+/* .ui-state-active {
+    z-index: 1050;
+    background-color: #ffffff;
+    color: black;
+} */
 
 .regex-search-filter {
     display: flex;
