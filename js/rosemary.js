@@ -81,38 +81,46 @@ function setupFilterValueChangedListenerHandler(activeTabID){
         newItems = [];                                                  // Refresh dropdown items
     });
 }
+
+function setupUserTypingInFilterListenerHandler(activeTabID){
+    $(document).on('input', '.predicate, .object, #show-attribute', function() {
+        newItems = [];                                                  // Refresh dropdown items
+        if ($(this).hasClass('predicate')) {
+            setupAutocomplete($(this), activeTabID, '.predicate', 'predicate');
+        }
+        if ($(this).hasClass('object')) {
+            setupAutocomplete($(this), activeTabID, '.object', 'object');
+        }
+    });
+}
+
+function displayExampleQuery(activeTabID){
+    var dropdown = document.getElementsByClassName('example-'+activeTabID)[0];
+    const selectedIndex = dropdown.selectedIndex;
+    const selectedValue = dropdown.options[selectedIndex];
+    constructExampleQuery(selectedValue);
+}
+
+function setupExampleSelectedOrChangedListenerHandler(activeTabID){
+    $(document).on('input', '.example-'+activeTabID, function() {
+        displayExampleQuery(activeTabID);
+    });
+
+    $(document).on('change', '*', function() {
+        var activeTab = document.querySelector('.tabPanel.active');
+        if ($(this).hasClass('example-'+activeTab.id)) {
+            displayExampleQuery(activeTab.id);
+        }
+    });
+}
+
 document.addEventListener('DOMContentLoaded', function() {
     var activeTab = document.querySelector('.tabPanel.active');
     console.log('active tab id: ', activeTab.id);
 
     setupFilterValueChangedListenerHandler(activeTab.id);
-
-    $(document).on('input', '.predicate, .object, #show-attribute', function() {
-        newItems = [];                                                  // Refresh dropdown items
-        if ($(this).hasClass('predicate')) {
-            setupAutocomplete($(this), activeTab.id, '.predicate', 'predicate');
-        }
-        if ($(this).hasClass('object')) {
-            setupAutocomplete($(this), activeTab.id, '.object', 'object');
-        }
-    });
-
-    $(document).on('input', '.example-'+activeTab.id, function() {
-        dropdown = document.getElementsByClassName('example-'+activeTab.id)[0];
-        const selectedIndex = dropdown.selectedIndex;
-        const selectedValue = dropdown.options[selectedIndex];
-        constructExampleQuery(selectedValue);
-    });
-
-    $(document).on('change', '*', function() {
-        activeTab = document.querySelector('.tabPanel.active');
-        if ($(this).hasClass('example-'+activeTab.id)) {
-            dropdown = document.getElementsByClassName('example-'+activeTab.id)[0];
-            const selectedIndex = dropdown.selectedIndex;
-            const selectedValue = dropdown.options[selectedIndex];
-            constructExampleQuery(selectedValue);
-        }
-    });
+    setupUserTypingInFilterListenerHandler(activeTab.id);
+    setupExampleSelectedOrChangedListenerHandler(activeTab.id);
 });
 
 function setFormValueAccordingToSelectedExample(selectedExample, formElement, fieldType) {
@@ -141,11 +149,11 @@ function updateValueValueRangeFilterFormValues(activeTabID, selectedExample){
         const datatype = $(this).find('.datatype');
 
         if ((predicate.length > 0) && (minValue.length > 0) && (maxValue.length > 0) && (datatype.length > 0)) {
-            setFormValueAccordingToSelectedExample(selectedExample, predicate, 'VRF_PREDICATE');
-            setFormValueAccordingToSelectedExample(selectedExample, minValue, 'VRF_MIN');
-            setFormValueAccordingToSelectedExample(selectedExample, maxValue, 'VRF_MAX');
-            setFormValueAccordingToSelectedExample(selectedExample, maxValue, 'VRF_MAX');
-            setFormValueAccordingToSelectedExample(selectedExample, datatype, 'DTYPE');
+            const formValues = [[predicate, 'VRF_PREDICATE'],[minValue, 'VRF_MIN'],[maxValue, 'VRF_MAX'],[datatype, 'DTYPE']];
+            
+            formValues.forEach(([value, key]) => {
+                setFormValueAccordingToSelectedExample(selectedExample, value, key);
+            });
         }
     });
 }
@@ -226,11 +234,22 @@ function fetchSuggestions(endpointUrl, type, term, page, callback) {
     });
 }
 
+function replaceLastOccurrence(str, token, replacement) {
+    const lastIndex = str.lastIndexOf(token);
+    if (lastIndex === -1) {
+        // Token not found, return the original string
+        return str;
+    }
+
+    // Replace the last occurrence of the token
+    return str.slice(0, lastIndex) + replacement + str.slice(lastIndex + token.length);
+}
+
 function buildAutocompleteQuery(type, term, limit, offset) {
     const search_tokens = term.split(/\s+/);
 
     // 'Starts with' regex character
-    regex_str = '^'; 
+    regex_str = '^\\\\s*'; 
 
     // Add regex expression for whitespace (inbetween each token)
     // This makes it possible for the matching input by the user to 
@@ -239,14 +258,18 @@ function buildAutocompleteQuery(type, term, limit, offset) {
         regex_str += search_tokens[i] + '\\\\s*';
     }
 
+    regex_str = replaceLastOccurrence(regex_str, '\\\\s*', '\\\\w*');
+
     // Some rdfs:labels for entities contain parentheses. Parentheses
     // has a meaning in regex syntax so we have to escape them
     regex_str = regex_str.replace('(', '\\\\(');
     regex_str = regex_str.replace(')', '\\\\)');
 
     if (type === 'predicate') {
+        console.log('regex1: ', regex_str);
         return TEMPLATE_QUERIES.PREDICATE(regex_str, limit, offset);
     } else if (type === 'object') {
+        console.log('regex2: ', regex_str);
         return TEMPLATE_QUERIES.OBJECT(regex_str, limit, offset);;
     }
 }
