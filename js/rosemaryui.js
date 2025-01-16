@@ -1,6 +1,6 @@
 function createRosemaryButton(tabPanelID){
   var rosemary_svg = CONSTANTS.ROSEMARY_ICON_SVG;
-  var rosemary_svg_component = drawSvgStringAsElement(rosemary_svg);
+  var rosemary_svg_component = drawSvgStringAsElement(rosemary_svg, tabPanelID, true);
   const rosemaryLinkWrapper = document.createElement("button");
   rosemaryLinkWrapper.id = tabPanelID;
   rosemaryLinkWrapper.className = "yasqe_rosemary";
@@ -97,7 +97,7 @@ function createGUI(tabPanelID) {
 
     // Create logo button (for query panel) - link to Github
     var rosemary_panel_logo_svg = CONSTANTS.ROSEMARY_ICON_SVG;
-    var rosemary_panel_logo_svg_component = drawSvgStringAsElement(rosemary_panel_logo_svg);
+    var rosemary_panel_logo_svg_component = drawSvgStringAsElement(rosemary_panel_logo_svg, tabPanelID, false);
     const rosemary_panel_logo = document.createElement("div");
     rosemary_panel_logo.title = 'Rosemary Github repository';
     rosemary_panel_logo.className = 'logo_rosemary';
@@ -228,12 +228,6 @@ function createGUI(tabPanelID) {
     dataSourceInput.type = 'text';
     dataSourceInput.value = 'https://dbpedia.org/sparql';
     dataSourceInput.placeholder='Data Source';
-
-    // const sparqlLink = document.createElement('a');
-    // sparqlLink.href = 'https://sparql.dev/article/SPARQL_endpoints_and_how_to_use_them.html';
-    // sparqlLink.textContent = 'What is SPARQL?';
-    // sparqlLink.target = '_blank';
-    // sparqlLink.classList.add('sparqlLink');
 
     inputLoaderContainerDiv.appendChild(dataSourceInput);
     dataSourcePanel.appendChild(inputLoaderContainerDiv);
@@ -367,7 +361,7 @@ function createGUI(tabPanelID) {
     const attributeValueRangeFilterAttributeInput = document.createElement('input');
     attributeValueRangeFilterAttributeInput.type = 'text';
     attributeValueRangeFilterAttributeInput.classList.add('predicate');
-    attributeValueRangeFilterAttributeInput.id = 'vpredicate0';
+    // attributeValueRangeFilterAttributeInput.id = 'vpredicate0';
     attributeValueRangeFilterAttributeInput.placeholder = 'Property (type for suggestions ...)';
 
     const hiddenInputValRange = document.createElement('input');
@@ -564,13 +558,17 @@ function createGUI(tabPanelID) {
 }
   
 // Function to draw SVG from a string
-function drawSvgStringAsElement(svgString) {
+function drawSvgStringAsElement(svgString, tabPanelID, isToggleButton) {
   if (svgString && svgString.trim().indexOf("<svg") === 0) {
     // No style passed via config, guess own styles
     var parser = new DOMParser();
     var dom = parser.parseFromString(svgString, "text/xml");
     var svg = dom.documentElement;
     svg.setAttribute("aria-hidden", "true");
+    if (isToggleButton) {
+      svg.classList.add('pulse');
+      svg.id = 'rosemaryButton-'+tabPanelID;
+    }
 
     var svgContainer = document.createElement("div");
     svgContainer.className = "svgImg";

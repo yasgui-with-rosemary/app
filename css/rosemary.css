@@ -622,3 +622,25 @@ ul {
         height: 0
     }
 }
+
+/***** Rosemary button pulse animation ******/
+@keyframes pulse {
+    0% {
+        transform: scale(1);
+        opacity: 1;
+    }
+    50% {
+        transform: scale(1.5);
+        opacity: 0.6;
+    }
+    100% {
+        transform: scale(1);
+        opacity: 1;
+    }
+}
+
+/* Class for pulse animation */
+.pulse {
+    animation: pulse 1.5s infinite;
+}
+/********************************************/

@@ -14,6 +14,7 @@ for (let i = 0; i < tabs.length; i++) {
 // Add Rosemary to each tab
 for (let i = 0; i < allTabs.length; i++) {
     addRosemaryToTab(allTabs[i]);
+    setupRosemaryButtonPulse(allTabs[i].id);
 }
 
 /** accessibility: to be compatible with screen readers and best practices **/
@@ -45,6 +46,7 @@ document.getElementsByClassName('closeTab')[0].addEventListener("click", (event)
     allTabs = document.getElementsByClassName('tabPanel');
     for (let i = 0; i < allTabs.length; i++) {
         addRosemaryToTab(allTabs[i]);
+        setupRosemaryButtonPulse(allTabs[i].id);
     }
     queryStrings = updateQueryStringList();
 });
@@ -54,6 +56,7 @@ document.getElementsByClassName('addTab')[0].addEventListener("click", (event) =
     allTabs = document.getElementsByClassName('tabPanel');
     for (let i = 0; i < allTabs.length; i++) {
         addRosemaryToTab(allTabs[i]);
+        setupRosemaryButtonPulse(allTabs[i].id);
     }
 
     closeTabButtons = document.getElementsByClassName('closeTab');
@@ -108,10 +111,27 @@ function setupExampleSelectedOrChangedListenerHandler(activeTabID){
 
     $(document).on('change', '*', function() {
         var activeTab = document.querySelector('.tabPanel.active');
+        activeTabPanel = document.querySelector('.tabPanel.active');
+        
         if ($(this).hasClass('example-'+activeTab.id)) {
             displayExampleQuery(activeTab.id);
         }
     });
+}
+
+// Function to toggle pulse effect
+function togglePulse() {
+    const rosemaryButton = document.getElementById(this.id);
+    if (rosemaryButton.classList.contains('pulse')) {
+        rosemaryButton.classList.remove('pulse'); // Stop the pulse
+    } else {
+        rosemaryButton.classList.add('pulse'); // Start the pulse
+    }
+}
+
+function setupRosemaryButtonPulse(activeTabID){
+    const rosemaryButton = document.getElementById('rosemaryButton-'+activeTabID);
+    rosemaryButton.addEventListener('click', togglePulse);
 }
 
 document.addEventListener('DOMContentLoaded', function() {
