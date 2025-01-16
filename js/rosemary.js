@@ -249,7 +249,7 @@ function buildAutocompleteQuery(type, term, limit, offset) {
     const search_tokens = term.split(/\s+/);
 
     // 'Starts with' regex character
-    regex_str = '^\\\\s*'; 
+    regex_str = ''; 
 
     // Add regex expression for whitespace (inbetween each token)
     // This makes it possible for the matching input by the user to 
@@ -258,7 +258,7 @@ function buildAutocompleteQuery(type, term, limit, offset) {
         regex_str += search_tokens[i] + '\\\\s*';
     }
 
-    regex_str = replaceLastOccurrence(regex_str, '\\\\s*', '\\\\w*');
+    regex_str = replaceLastOccurrence(regex_str, '\\\\s*', '.*');
 
     // Some rdfs:labels for entities contain parentheses. Parentheses
     // has a meaning in regex syntax so we have to escape them
