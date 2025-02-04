@@ -114,6 +114,10 @@ function setupExampleSelectedOrChangedListenerHandler(activeTabID){
         activeTabPanel = document.querySelector('.tabPanel.active');
         
         if ($(this).hasClass('example-'+activeTab.id)) {
+            setupFilterListener(activeTabID);
+        }
+
+        if ($(this).hasClass('example-'+activeTab.id)) {
             displayExampleQuery(activeTab.id);
         }
     });
@@ -134,13 +138,391 @@ function setupRosemaryButtonPulse(activeTabID){
     rosemaryButton.addEventListener('click', togglePulse);
 }
 
-document.addEventListener('DOMContentLoaded', function() {
-    var activeTab = document.querySelector('.tabPanel.active');
-    console.log('active tab id: ', activeTab.id);
+// Keep track of active filters
+let activeFilters = new Set();
 
-    setupFilterValueChangedListenerHandler(activeTab.id);
-    setupUserTypingInFilterListenerHandler(activeTab.id);
-    setupExampleSelectedOrChangedListenerHandler(activeTab.id);
+// Modify addSearchFilter to explicitly use the active tab
+function addSearchFilter(activeTabID) {
+    // Find the vfexample div within the ACTIVE tab
+    const vfexample = document.querySelector(`#main-content-${activeTabID} #vfexample`);
+    if (!vfexample) {
+        console.error('Could not find vfexample in active tab');
+        return;
+    }
+
+    // Create unique ID for this filter
+    // const filterId = `filter-${Date.now()}-${Math.random().toString(36)}`;
+    const filterId = `vfpredicate-${filterCount}`;
+    const filterObjId = `vfobject-${filterCount}`;
+    
+    // Create container for the new filter
+    const filterContainer = document.createElement('div');
+    filterContainer.classList.add('added-filter-container');
+    filterContainer.classList.add('attr-val-filter-vf');
+    filterContainer.id = filterId;
+
+    const searchFilterDiv = document.createElement('div');
+    searchFilterDiv.classList.add('search-filter-'+activeTabID);
+
+    // Create predicate input container
+    const predInputLoaderContainerDiv = document.createElement('div');
+    predInputLoaderContainerDiv.classList.add('input-loader-container');
+
+    const predInput = document.createElement('input');
+    predInput.type = 'text';
+    predInput.classList.add('predicate');
+    predInput.id = filterId;
+    predInput.placeholder = 'Property (type for suggestions ...)';
+
+    const hiddenInput = document.createElement('input');
+    hiddenInput.type = 'hidden';
+    hiddenInput.classList.add('hidden-uri');
+
+    const loaderDiv = document.createElement('div');
+    loaderDiv.classList.add('loader');
+
+    const spanVP = document.createElement('span');
+    spanVP.classList.add('search-icon');
+    spanVP.textContent = '🔍';
+
+    predInputLoaderContainerDiv.appendChild(predInput);
+    predInputLoaderContainerDiv.appendChild(hiddenInput);
+    predInputLoaderContainerDiv.appendChild(spanVP);
+    predInputLoaderContainerDiv.appendChild(loaderDiv);
+
+    // Create object input container
+    const objInputLoaderContainerDiv = document.createElement('div');
+    objInputLoaderContainerDiv.classList.add('input-loader-container');
+
+    const objInput = document.createElement('input');
+    objInput.type = 'text';
+    objInput.id = filterObjId;
+    objInput.classList.add('object');
+    objInput.placeholder = 'Value (type for suggestions ...)';
+
+    const hiddenInput2 = document.createElement('input');
+    hiddenInput2.type = 'hidden';
+    hiddenInput2.classList.add('hidden-uri');
+
+    const loaderDiv2 = document.createElement('div');
+    loaderDiv2.classList.add('loader');
+
+    const spanVV = document.createElement('span');
+    spanVV.classList.add('search-icon');
+    spanVV.textContent = '🔍';
+
+    objInputLoaderContainerDiv.appendChild(objInput);
+    objInputLoaderContainerDiv.appendChild(hiddenInput2);
+    objInputLoaderContainerDiv.appendChild(spanVV);
+    objInputLoaderContainerDiv.appendChild(loaderDiv2);
+
+    // Create delete button
+    const deleteButton = document.createElement('button');
+    deleteButton.classList.add('delete-filter-button');
+    deleteButton.innerHTML = '✕';
+    deleteButton.title = 'Remove this filter';
+    deleteButton.onclick = function() {
+        activeFilters.delete(filterId);
+        filterContainer.remove();
+        updateSparqlQuery();
+    };
+
+    // Assemble all components
+    searchFilterDiv.appendChild(predInputLoaderContainerDiv);
+    searchFilterDiv.appendChild(objInputLoaderContainerDiv);
+    searchFilterDiv.appendChild(deleteButton);
+    filterContainer.appendChild(searchFilterDiv);
+
+    // Add the new filter to the vfexample div
+    vfexample.appendChild(filterContainer);
+
+    // Set up autocomplete for the new inputs
+    setupAutocomplete($('#' + predInput.id), activeTabID, '.predicate', 'predicate');
+    setupAutocomplete($('#' + objInput.id), activeTabID, '.object', 'object');
+
+    // Track this filter
+    activeFilters.add(filterId);
+    filterCount++;
+}
+
+function addValueRangeFilter(activeTabID){
+    // Find the vfexample div within the ACTIVE tab
+    const vrfdiv = document.querySelector('.value-search-filter-'+activeTabID);
+    if (!vrfdiv) {
+        console.error('Could not find vrfdiv in active tab');
+        return;
+    }
+    
+    // Create unique ID for this filter
+    // const filterId = `filter-${Date.now()}-${Math.random().toString(36)}`;
+    const filterId = `vrfpredicate-${valueFilterCount}`;
+    const filterMinId = `min-val-${valueFilterCount}`;
+    const filterMaxId = `max-val-${valueFilterCount}`;
+
+    // Create container for the new filter
+    const filterContainer = document.createElement('div');
+    filterContainer.classList.add('added-filter-container');
+    filterContainer.id = filterId;
+
+    const attributeValueRangeFilterPanel = document.createElement('div');
+    const attributeValueRangeFilterBoxesPanel = document.createElement('div');
+    attributeValueRangeFilterBoxesPanel.classList.add('value-search-filter-'+activeTabID);
+
+    const attributeValueRangeFilterAttributeInput = document.createElement('input');
+    attributeValueRangeFilterAttributeInput.type = 'text';
+    attributeValueRangeFilterAttributeInput.classList.add('predicate');
+    attributeValueRangeFilterAttributeInput.id = filterId;
+    attributeValueRangeFilterAttributeInput.placeholder = 'Property (type for suggestions ...)';
+
+    const hiddenInputValRange = document.createElement('input');
+    hiddenInputValRange.type = 'hidden';
+    hiddenInputValRange.classList.add('hidden-uri');
+
+    const loaderDivValRange = document.createElement('div');
+    loaderDivValRange.classList.add('loader');
+    
+    const inputDiv = document.createElement('div');
+    inputDiv.classList.add('input-loader-container');
+
+    const spanVRP = document.createElement('span');
+    spanVRP.classList.add('search-icon');
+    spanVRP.textContent = '🔍';
+
+    inputDiv.appendChild(attributeValueRangeFilterAttributeInput);
+    inputDiv.appendChild(hiddenInputValRange);
+    inputDiv.appendChild(spanVRP);
+    inputDiv.appendChild(loaderDivValRange);
+    
+    attributeValueRangeFilterBoxesPanel.appendChild(inputDiv);
+
+    const divMin = document.createElement('div');
+    divMin.classList.add('input-loader-container');
+    const attributeValueRangeFilterMinInput = document.createElement('input');
+    attributeValueRangeFilterMinInput.type = 'text';
+    attributeValueRangeFilterMinInput.id = filterMinId;
+    attributeValueRangeFilterMinInput.classList.add('min-val');
+    attributeValueRangeFilterMinInput.placeholder = 'Min Value';
+    divMin.appendChild(attributeValueRangeFilterMinInput);
+    attributeValueRangeFilterBoxesPanel.appendChild(divMin);
+    
+    const divMax = document.createElement('div');
+    divMax.classList.add('input-loader-container');
+    const attributeValueRangeFilterMaxInput = document.createElement('input');
+    attributeValueRangeFilterMaxInput.type = 'text';
+    attributeValueRangeFilterMaxInput.id = filterMaxId;
+    attributeValueRangeFilterMaxInput.classList.add('max-val');
+    attributeValueRangeFilterMaxInput.placeholder = 'Max Value';
+    
+    divMax.appendChild(attributeValueRangeFilterMaxInput);
+    attributeValueRangeFilterBoxesPanel.appendChild(divMax);
+
+    const dropdownDiv = document.createElement('div');
+    dropdownDiv.classList.add('dtype-dropdown');
+
+    const dropdown = document.createElement('select');
+    dropdown.classList.add('datatype');
+    const dateOption = document.createElement('option');
+    dateOption.value = 'xsd:date';
+    dateOption.textContent = 'Date';
+    const intOption = document.createElement('option');
+    intOption.value = 'xsd:integer';
+    intOption.textContent = 'Integer';
+    const decOption = document.createElement('option');
+    decOption.value = 'xsd:decimal';
+    decOption.textContent = 'Decimal';
+    const floatOption = document.createElement('option');
+    floatOption.value = 'xsd:float';
+    floatOption.textContent = 'Float';
+    const doubleOption = document.createElement('option');
+    doubleOption.value = 'xsd:double';
+    doubleOption.textContent = 'Double';
+    
+    dropdown.appendChild(dateOption);
+    dropdown.appendChild(intOption);
+    dropdown.appendChild(decOption);
+    dropdown.appendChild(floatOption);
+    dropdown.appendChild(doubleOption);
+
+    dropdownDiv.appendChild(dropdown);
+
+    // Assemble all components
+    attributeValueRangeFilterBoxesPanel.appendChild(dropdownDiv);
+    attributeValueRangeFilterPanel.appendChild(attributeValueRangeFilterBoxesPanel);
+
+    // Create delete button
+    const deleteButton = document.createElement('button');
+    deleteButton.classList.add('delete-filter-button');
+    deleteButton.innerHTML = '✕';
+    deleteButton.title = 'Remove this filter';
+    deleteButton.onclick = function() {
+        activeFilters.delete(filterId);
+        filterContainer.remove();
+        updateSparqlQuery();
+    };
+
+    attributeValueRangeFilterPanel.appendChild(deleteButton);
+    filterContainer.appendChild(attributeValueRangeFilterPanel);
+    vrfdiv.appendChild(filterContainer);
+
+    // Set up autocomplete for the new inputs
+    setupAutocomplete($('#' + attributeValueRangeFilterAttributeInput.id), activeTabID, '.predicate', 'predicate');
+
+    // Track this filter
+    activeFilters.add(filterId);
+    valueFilterCount++;
+}
+
+function addStringMatchFilter(activeTabID){
+    // Find the vfexample div within the ACTIVE tab
+    const regexdiv = document.querySelector('.regex-search-filter-'+activeTabID);
+    if (!regexdiv) {
+        console.error('Could not find regex in active tab');
+        return;
+    }
+    
+    // Create unique ID for this filter
+    const filterId = `smfpredicate-${regexFilterCount}`;
+    const regexId = `regex-${regexFilterCount}`;
+    
+    // Create container for the new filter
+    const filterContainer = document.createElement('div');
+    filterContainer.classList.add('added-filter-container');
+    filterContainer.id = filterId;
+
+    const stringMatchFilterPanel = document.createElement('div');
+    const stringMatchFilterBoxesPanel = document.createElement('div');
+    stringMatchFilterBoxesPanel.classList.add('regex-search-filter-'+activeTabID);
+
+    // stringMatchFilterPanel.classList.add('attr-val-filter');
+
+    const stringMatchFilterAttributeInput = document.createElement('input');
+    stringMatchFilterAttributeInput.type = 'text';
+    stringMatchFilterAttributeInput.classList.add('predicate');
+    stringMatchFilterAttributeInput.id = filterId;
+    stringMatchFilterAttributeInput.placeholder = 'Property (type for suggestions ...)';
+
+    const hiddenInputRegexPred = document.createElement('input');
+    hiddenInputRegexPred.type = 'hidden';
+    hiddenInputRegexPred.classList.add('hidden-uri');
+
+    const loaderDivRegexPred = document.createElement('div');
+    loaderDivRegexPred.classList.add('loader');
+    
+    const inputDivRegex = document.createElement('div');
+    inputDivRegex.classList.add('input-loader-container');
+
+    const spanSM = document.createElement('span');
+    spanSM.classList.add('search-icon');
+    spanSM.textContent = '🔍';
+
+    inputDivRegex.appendChild(stringMatchFilterAttributeInput);
+    inputDivRegex.appendChild(hiddenInputRegexPred);
+    inputDivRegex.appendChild(spanSM);
+    inputDivRegex.appendChild(loaderDivRegexPred);
+    
+    stringMatchFilterBoxesPanel.appendChild(inputDivRegex);
+    
+    const inputDivRegexPattern = document.createElement('div');
+    inputDivRegexPattern.classList.add('input-loader-container');
+
+    const stringMatchFilterValueInput = document.createElement('input');
+    stringMatchFilterValueInput.type = 'text';
+    stringMatchFilterValueInput.classList.add('regex');
+    stringMatchFilterValueInput.id = regexId;
+    stringMatchFilterValueInput.placeholder='Regular expression';
+
+    inputDivRegexPattern.appendChild(stringMatchFilterValueInput);
+    stringMatchFilterBoxesPanel.appendChild(inputDivRegexPattern);
+    stringMatchFilterPanel.appendChild(stringMatchFilterBoxesPanel);
+    
+    // Create delete button
+    const deleteButton = document.createElement('button');
+    deleteButton.classList.add('delete-filter-button');
+    deleteButton.innerHTML = '✕';
+    deleteButton.title = 'Remove this filter';
+    deleteButton.onclick = function() {
+        activeFilters.delete(filterId);
+        filterContainer.remove();
+        updateSparqlQuery();
+    };
+
+    stringMatchFilterPanel.appendChild(deleteButton);
+    filterContainer.appendChild(stringMatchFilterPanel);
+    regexdiv.appendChild(filterContainer);
+
+    // Set up autocomplete for the new inputs
+    setupAutocomplete($('#' + stringMatchFilterAttributeInput.id), activeTabID, '.predicate', 'predicate');
+
+    // Track this filter
+    activeFilters.add(filterId);
+    regexFilterCount++;
+}
+
+// Update the setupFilterListener function to handle all filter types
+function setupFilterListener(activeTabID) {
+    // Existing Value Filter button
+    const addFilterButton = document.getElementById('add-vfilter-' + activeTabID);
+    if (addFilterButton) {
+        const newButton = addFilterButton.cloneNode(true);
+        addFilterButton.parentNode.replaceChild(newButton, addFilterButton);
+        newButton.addEventListener("click", () => {
+            addSearchFilter(activeTabID);
+        });
+    }
+
+    // Value Range Filter button
+    const addVRangeFilterButton = document.getElementById('add-vrange-filter-' + activeTabID);
+    if (addVRangeFilterButton) {
+        const newButton = addVRangeFilterButton.cloneNode(true);
+        addVRangeFilterButton.parentNode.replaceChild(newButton, addVRangeFilterButton);
+        newButton.addEventListener("click", () => {
+            addValueRangeFilter(activeTabID);
+        });
+    }
+
+    // String Match Filter button
+    const addSMatchFilterButton = document.getElementById('add-smatch-filter-' + activeTabID);
+    if (addSMatchFilterButton) {
+        const newButton = addSMatchFilterButton.cloneNode(true);
+        addSMatchFilterButton.parentNode.replaceChild(newButton, addSMatchFilterButton);
+        newButton.addEventListener("click", () => {
+            addStringMatchFilter(activeTabID);
+        });
+    }
+
+    // Display Property button
+    const addDisplayPropButton = document.getElementById('add-display-prop-' + activeTabID);
+    if (addDisplayPropButton) {
+        const newButton = addDisplayPropButton.cloneNode(true);
+        addDisplayPropButton.parentNode.replaceChild(newButton, addDisplayPropButton);
+        newButton.addEventListener("click", () => {
+            addDisplayProperty(activeTabID);
+        });
+    }
+}
+
+// Update document ready handler to properly handle tab initialization
+document.addEventListener('DOMContentLoaded', function() {
+    // Get the active tab when the page loads
+    var activeTab = document.querySelector('.tabPanel.active');
+    if (activeTab) {
+        setupFilterListener(activeTab.id);
+        setupFilterValueChangedListenerHandler(activeTab.id);
+        setupUserTypingInFilterListenerHandler(activeTab.id);
+        setupExampleSelectedOrChangedListenerHandler(activeTab.id);
+    }
+
+    // Set up listeners for tab changes
+    const tabPanels = document.getElementsByClassName('tabPanel');
+    for (let tabPanel of tabPanels) {
+        tabPanel.addEventListener('click', function() {
+            if (this.classList.contains('active')) {
+                setupFilterListener(this.id);
+            }
+        });
+    }
+
+
 });
 
 function setFormValueAccordingToSelectedExample(selectedExample, formElement, fieldType) {
@@ -340,47 +722,41 @@ function updateQueryValueFilter(activeTabID) {
 
 function updateQueryValueRangeFilter(activeTabID) {
     $('.value-search-filter-'+activeTabID).each(function() {
+        const mainpred = $(this).find('.predicate');
         const predicate = $(this).find('.predicate').next('.hidden-uri').val();
-        // const predicateObj = $(this).find('.predicate');
         const datatype = $(this).find('.datatype').val();
-        // const predicateId = predicateObj.attr('id');
-
-        // With multiple filters:
-        // const numberPart = predicateId.match(/-(\d+)$/)[1];
-
         const minValue = $(this).find('.min-val').val();
         const maxValue = $(this).find('.max-val').val();
+        const filterId = mainpred.attr('id');
+        const filterIdParts = filterId.split('-');
 
         if (predicate && minValue && maxValue) {
             const valPred = $(this).find('.predicate').val();
             queryStrings[activeTabID] += `
     # ... with ${valPred} between ${minValue} and ${maxValue} ...
-    ?subject <${predicate}> ?value .
-    FILTER(?value >= "${minValue}"^^${datatype} && ?value <= "${maxValue}"^^${datatype})
+    ?subject <${predicate}> ?valueRF${filterIdParts[1]} .
+    FILTER(?valueRF${filterIdParts[1]} >= "${minValue}"^^${datatype} && ?valueRF${filterIdParts[1]} <= "${maxValue}"^^${datatype})
             `;
         }
-
-        // With multiple filters:
-        // if (predicate && minValue && maxValue) {
-        //     queryStrings[activeTab.id] += `
-        //     ?subject <${predicate}> ?value${numberPart} .
-        //     FILTER(?value${numberPart} >= "${minValue}"^^${datatype} && ?value${numberPart} <= "${maxValue}"^^${datatype})
-        //     `;
-        // }
     });
 }
 
 function updateQueryRegexFilter(activeTabID) {
     $('.regex-search-filter-'+activeTabID).each(function() {
+        const mainpred = $(this).find('.predicate');
         const predicate = $(this).find('.predicate').next('.hidden-uri').val();
+
         const regex = $(this).find('.regex').val();
+        
+        const filterId = mainpred.attr('id');
+        const filterIdParts = filterId.split('-');
 
         if (predicate && regex) {
             const valPred = $(this).find('.predicate').val();
             queryStrings[activeTabID] += `
     # ... with ${valPred} matching the regular expression ${regex} ... 
-    ?subject <${predicate}> ?regexValue .
-    FILTER(regex(?regexValue, "${regex}", "i"))
+    ?subject <${predicate}> ?regexValue${filterIdParts[1]} .
+    FILTER(regex(?regexValue${filterIdParts[1]}, "${regex}", "i"))
             `;
         }
     });
