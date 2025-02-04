@@ -1,6 +1,6 @@
 function createRosemaryButton(tabPanelID){
   var rosemary_svg = CONSTANTS.ROSEMARY_ICON_SVG;
-  var rosemary_svg_component = drawSvgStringAsElement(rosemary_svg);
+  var rosemary_svg_component = drawSvgStringAsElement(rosemary_svg, tabPanelID, true);
   const rosemaryLinkWrapper = document.createElement("button");
   rosemaryLinkWrapper.id = tabPanelID;
   rosemaryLinkWrapper.className = "yasqe_rosemary";
@@ -23,33 +23,32 @@ function addRosemaryToTab(tabPanel){
   if (buttonExists) {
     console.log('button already exists');
     return;
-  }
-  else{
+  } 
+  else {
     const rosemaryButton = createRosemaryButton(tabPanel.id);
     rosemaryButton.addEventListener("click", (event) => {
-      gui = document.querySelector('.tabPanel').querySelector('#main-content-'+tabPanel.id);
-      if (!gui){
-        gui = document.querySelector('.tabPanel.active').querySelector('#main-content-'+tabPanel.id);
-      }
-      if (gui) {
-          if (gui.classList.contains('open')) {
-              gui.classList.remove('open');
-          }
-          else{
-              gui.classList.add('open');
-          }
-      }
-      else {
-          let newGui = createGUI(rosemaryButton.id);
-          if (newGui) {
-            gui = newGui;
-          }
-      }
-      event.stopPropagation();
+        gui = document.querySelector('.tabPanel').querySelector('#main-content-'+tabPanel.id);
+        if (!gui) {
+            gui = document.querySelector('.tabPanel.active').querySelector('#main-content-'+tabPanel.id);
+        }
+        if (gui) {
+            if (gui.classList.contains('open')) {
+                gui.classList.remove('open');
+            } else {
+                gui.classList.add('open');
+            }
+        } else {
+            let newGui = createGUI(rosemaryButton.id);
+            if (newGui) {
+                gui = newGui;
+                // Set up filter listener after creating new GUI
+                setupFilterListener(tabPanel.id);
+            }
+        }
+        event.stopPropagation();
     });
-  
+
     var yasqeButtons = tabPanel.querySelector('.yasqe_buttons');
-  
     if (yasqeButtons) {
         yasqeButtons.appendChild(rosemaryButton);
         console.log('Found yasqe_buttons: ', yasqeButtons, ' tab panel id: ', tabPanel.id);
@@ -97,7 +96,7 @@ function createGUI(tabPanelID) {
 
     // Create logo button (for query panel) - link to Github
     var rosemary_panel_logo_svg = CONSTANTS.ROSEMARY_ICON_SVG;
-    var rosemary_panel_logo_svg_component = drawSvgStringAsElement(rosemary_panel_logo_svg);
+    var rosemary_panel_logo_svg_component = drawSvgStringAsElement(rosemary_panel_logo_svg, tabPanelID, false);
     const rosemary_panel_logo = document.createElement("div");
     rosemary_panel_logo.title = 'Rosemary Github repository';
     rosemary_panel_logo.className = 'logo_rosemary';
@@ -142,8 +141,9 @@ function createGUI(tabPanelID) {
 
     const spanInfoDS = document.createElement('span');
     spanInfoDS.classList.add('tooltiptext');
+    spanInfoDS.classList.add('dsbottom');
     spanInfoDS.textContent = 'Enter the URL for a publicly accessible SPARQL endpoint which you intend to query.';
-
+    
     divInfoDS.appendChild(spanInfoDS);
 
     const divInfoVF = document.createElement('div');
@@ -202,6 +202,7 @@ function createGUI(tabPanelID) {
 
     const spanInfoExamples = document.createElement('span');
     spanInfoExamples.classList.add('tooltiptext');
+    spanInfoExamples.classList.add('exleft');
     spanInfoExamples.textContent = 'Predefined example queries for DBpedia to aid in formulating your own custom queries.';
 
     divInfoExamples.appendChild(spanInfoExamples);
@@ -229,12 +230,6 @@ function createGUI(tabPanelID) {
     dataSourceInput.value = 'https://dbpedia.org/sparql';
     dataSourceInput.placeholder='Data Source';
 
-    // const sparqlLink = document.createElement('a');
-    // sparqlLink.href = 'https://sparql.dev/article/SPARQL_endpoints_and_how_to_use_them.html';
-    // sparqlLink.textContent = 'What is SPARQL?';
-    // sparqlLink.target = '_blank';
-    // sparqlLink.classList.add('sparqlLink');
-
     inputLoaderContainerDiv.appendChild(dataSourceInput);
     dataSourcePanel.appendChild(inputLoaderContainerDiv);
 
@@ -247,7 +242,7 @@ function createGUI(tabPanelID) {
     /************** Attribute Value Filter components ****************/
 
     const totalDiv = document.createElement('div');
-    totalDiv.classList.add('attr-val-filter');
+    totalDiv.classList.add('attr-val-filter-vf');
 
     const attributeValueLabel = document.createElement('label');
     attributeValueLabel.textContent = 'Value Filter';
@@ -264,6 +259,7 @@ function createGUI(tabPanelID) {
     const predInput = document.createElement('input');
     predInput.type = 'text';
     predInput.classList.add('predicate');
+    predInput.id = 'vfpredicate-0';
     predInput.placeholder = 'Property (type for suggestions ...)';
 
     const hiddenInput = document.createElement('input');
@@ -289,6 +285,7 @@ function createGUI(tabPanelID) {
 
     const objInput = document.createElement('input');
     objInput.type = 'text';
+    objInput.id = 'vfobject-0';
     objInput.classList.add('object');
     objInput.placeholder = 'Value (type for suggestions ...)';
 
@@ -345,11 +342,20 @@ function createGUI(tabPanelID) {
     exDropdownDiv.appendChild(exDropdown);
 
     const vfExample = document.createElement('div');
+    vfExample.id = 'vfexample';
     vfExample.classList.add('vfexample');
     vfExample.appendChild(totalDiv);
     vfExample.appendChild(exDropdownDiv);
 
     flexbox.appendChild(vfExample);
+
+    const addAttributeValueFilterContainer = document.createElement('div');
+    addAttributeValueFilterContainer.classList.add('add-filter-button');
+    const addAttributeValueFilterButton = document.createElement('button');
+    addAttributeValueFilterButton.textContent = '+';
+    addAttributeValueFilterContainer.appendChild(addAttributeValueFilterButton);
+    addAttributeValueFilterButton.id = 'add-vfilter-'+tabPanelID;
+    flexbox.appendChild(addAttributeValueFilterContainer);
 
     /************** Attribute Value Range Filter components ****************/
 
@@ -367,7 +373,7 @@ function createGUI(tabPanelID) {
     const attributeValueRangeFilterAttributeInput = document.createElement('input');
     attributeValueRangeFilterAttributeInput.type = 'text';
     attributeValueRangeFilterAttributeInput.classList.add('predicate');
-    attributeValueRangeFilterAttributeInput.id = 'vpredicate0';
+    attributeValueRangeFilterAttributeInput.id = 'vrfpredicate-0';
     attributeValueRangeFilterAttributeInput.placeholder = 'Property (type for suggestions ...)';
 
     const hiddenInputValRange = document.createElement('input');
@@ -395,6 +401,7 @@ function createGUI(tabPanelID) {
     divMin.classList.add('input-loader-container');
     const attributeValueRangeFilterMinInput = document.createElement('input');
     attributeValueRangeFilterMinInput.type = 'text';
+    attributeValueRangeFilterMinInput.id = 'min-val-0';
     attributeValueRangeFilterMinInput.classList.add('min-val');
     attributeValueRangeFilterMinInput.placeholder = 'Min Value';
     divMin.appendChild(attributeValueRangeFilterMinInput);
@@ -404,6 +411,7 @@ function createGUI(tabPanelID) {
     divMax.classList.add('input-loader-container');
     const attributeValueRangeFilterMaxInput = document.createElement('input');
     attributeValueRangeFilterMaxInput.type = 'text';
+    attributeValueRangeFilterMaxInput.id = 'max-val-0';
     attributeValueRangeFilterMaxInput.classList.add('max-val');
     attributeValueRangeFilterMaxInput.placeholder = 'Max Value';
     divMax.appendChild(attributeValueRangeFilterMaxInput);
@@ -441,6 +449,17 @@ function createGUI(tabPanelID) {
     attributeValueRangeFilterBoxesPanel.appendChild(dropdownDiv);
     attributeValueRangeFilterPanel.appendChild(attributeValueRangeFilterBoxesPanel);
 
+    /***************** add filter for this component *******************/
+    const addValueRangeFilterContainer = document.createElement('div');
+    addValueRangeFilterContainer.classList.add('add-filter-button');
+    const addValueRangeFilterButton = document.createElement('button');
+    addValueRangeFilterButton.textContent = '+';
+    addValueRangeFilterButton.id = 'add-vrange-filter-'+tabPanelID;
+    addValueRangeFilterContainer.appendChild(addValueRangeFilterButton);
+    attributeValueRangeFilterPanel.appendChild(addValueRangeFilterContainer);
+    // flexbox.appendChild(addValueRangeFilterContainer);
+    /*******************************************************************/
+
     flexbox.appendChild(attributeValueRangeFilterPanel);
 
     /************** String Match Filter components ****************/
@@ -459,6 +478,7 @@ function createGUI(tabPanelID) {
     const stringMatchFilterAttributeInput = document.createElement('input');
     stringMatchFilterAttributeInput.type = 'text';
     stringMatchFilterAttributeInput.classList.add('predicate');
+    stringMatchFilterAttributeInput.id = 'smfpredicate-0';
     stringMatchFilterAttributeInput.placeholder = 'Property (type for suggestions ...)';
 
     const hiddenInputRegexPred = document.createElement('input');
@@ -488,12 +508,25 @@ function createGUI(tabPanelID) {
     const stringMatchFilterValueInput = document.createElement('input');
     stringMatchFilterValueInput.type = 'text';
     stringMatchFilterValueInput.classList.add('regex');
+    stringMatchFilterValueInput.id = 'regex-0';
     stringMatchFilterValueInput.placeholder='Regular expression';
 
     inputDivRegexPattern.appendChild(stringMatchFilterValueInput);
     stringMatchFilterBoxesPanel.appendChild(inputDivRegexPattern);
 
     stringMatchFilterPanel.appendChild(stringMatchFilterBoxesPanel);
+
+    /***************** add filter for this component *******************/
+    const addRegexFilterContainer = document.createElement('div');
+    addRegexFilterContainer.classList.add('add-filter-button');
+    const addRegexFilterButton = document.createElement('button');
+    addRegexFilterButton.textContent = '+';
+    addRegexFilterButton.id = 'add-smatch-filter-'+tabPanelID;
+    addRegexFilterContainer.appendChild(addRegexFilterButton);
+    stringMatchFilterPanel.appendChild(addRegexFilterContainer);
+    // flexbox.appendChild(addValueRangeFilterContainer);
+    /*******************************************************************/
+
     flexbox.appendChild(stringMatchFilterPanel);
 
     /************** Show Attribute components ****************/
@@ -505,7 +538,7 @@ function createGUI(tabPanelID) {
     showAttributeSectionPanel.classList.add('show-attribute-section-'+tabPanelID);
 
     const showAttributeLabel = document.createElement('label');
-    showAttributeLabel.textContent = 'Display Property';
+    showAttributeLabel.textContent = 'Display Properties';
 
     showAttributeLabel.appendChild(divInfoDP);
     showAttributePanel.appendChild(showAttributeLabel);
@@ -515,6 +548,7 @@ function createGUI(tabPanelID) {
 
     const showAttributeInput = document.createElement('input');
     showAttributeInput.classList.add('predicate');
+    showAttributeInput.id = 'dpredicate-0';
     showAttributeInput.type = 'text';
     showAttributeInput.placeholder = 'Property (type for suggestions ...)';
 
@@ -536,6 +570,16 @@ function createGUI(tabPanelID) {
     
     showAttributeSectionPanel.appendChild(inputContainerDiv);
     showAttributePanel.appendChild(showAttributeSectionPanel);
+
+    /***************** add filter for this component *******************/
+    const addDisplayPropertyContainer = document.createElement('div');
+    addDisplayPropertyContainer.classList.add('add-filter-button');
+    const addDisplayPropertyButton = document.createElement('button');
+    addDisplayPropertyButton.textContent = '+';
+    addDisplayPropertyButton.id = 'add-display-prop-' + tabPanelID;
+    addDisplayPropertyContainer.appendChild(addDisplayPropertyButton);
+    showAttributePanel.appendChild(addDisplayPropertyContainer);
+    /*******************************************************************/
 
     flexbox.appendChild(showAttributePanel);
 
@@ -564,13 +608,17 @@ function createGUI(tabPanelID) {
 }
   
 // Function to draw SVG from a string
-function drawSvgStringAsElement(svgString) {
+function drawSvgStringAsElement(svgString, tabPanelID, isToggleButton) {
   if (svgString && svgString.trim().indexOf("<svg") === 0) {
     // No style passed via config, guess own styles
     var parser = new DOMParser();
     var dom = parser.parseFromString(svgString, "text/xml");
     var svg = dom.documentElement;
     svg.setAttribute("aria-hidden", "true");
+    if (isToggleButton) {
+      svg.classList.add('pulse');
+      svg.id = 'rosemaryButton-'+tabPanelID;
+    }
 
     var svgContainer = document.createElement("div");
     svgContainer.className = "svgImg";
