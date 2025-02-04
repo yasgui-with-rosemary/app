@@ -76,7 +76,7 @@ let filterCount = 1;
 let valueFilterCount = 1;
 let newItems = [];
 let regexFilterCount = 1;
-let showAttributeCount = 1;
+let displayPropertyCount = 1;
 
 function setupFilterValueChangedListenerHandler(activeTabID){
     $(document).on('change', '.predicate, .min-val, .max-val, .regex, .object, .datatype, #limit-val-'+activeTabID, function() {
@@ -393,8 +393,6 @@ function addStringMatchFilter(activeTabID){
     const stringMatchFilterBoxesPanel = document.createElement('div');
     stringMatchFilterBoxesPanel.classList.add('regex-search-filter-'+activeTabID);
 
-    // stringMatchFilterPanel.classList.add('attr-val-filter');
-
     const stringMatchFilterAttributeInput = document.createElement('input');
     stringMatchFilterAttributeInput.type = 'text';
     stringMatchFilterAttributeInput.classList.add('predicate');
@@ -458,6 +456,76 @@ function addStringMatchFilter(activeTabID){
     regexFilterCount++;
 }
 
+function addDisplayProp(activeTabID){
+    // Find the vfexample div within the ACTIVE tab
+    const dpdiv = document.querySelector('.show-attribute-section-'+activeTabID);
+    if (!dpdiv) {
+        console.error('Could not find display property div in active tab');
+        return;
+    }
+
+    // Create unique ID for this filter
+    const filterId = `dpredicate-${displayPropertyCount}`;
+
+    // Create container for the new filter
+    const filterContainer = document.createElement('div');
+    filterContainer.id = filterId;
+
+    const showAttributePanel = document.createElement('div');
+    const showAttributeSectionPanel = document.createElement('div');
+    showAttributeSectionPanel.classList.add('show-attribute-section-'+activeTabID);
+
+    const inputContainerDiv = document.createElement('div');
+    inputContainerDiv.classList.add('input-loader-container');
+
+    const showAttributeInput = document.createElement('input');
+    showAttributeInput.classList.add('predicate');
+    showAttributeInput.id = filterId;
+    showAttributeInput.type = 'text';
+    showAttributeInput.placeholder = 'Property (type for suggestions ...)';
+
+    const hiddenInput3 = document.createElement('input');
+    hiddenInput3.type = 'hidden';
+    hiddenInput3.classList.add('hidden-uri');
+
+    const loaderDiv3 = document.createElement('div');
+    loaderDiv3.classList.add('loader');
+
+    const spanDP = document.createElement('span');
+    spanDP.classList.add('search-icon');
+    spanDP.textContent = '🔍';    
+
+    inputContainerDiv.appendChild(showAttributeInput);
+    inputContainerDiv.appendChild(hiddenInput3);
+    inputContainerDiv.appendChild(spanDP);
+    inputContainerDiv.appendChild(loaderDiv3);
+    showAttributeSectionPanel.appendChild(inputContainerDiv);
+    showAttributePanel.appendChild(showAttributeSectionPanel);
+
+    // Create delete button
+    const deleteButton = document.createElement('button');
+    deleteButton.classList.add('delete-filter-button');
+    deleteButton.innerHTML = '✕';
+    deleteButton.title = 'Remove this filter';
+    deleteButton.onclick = function() {
+        activeFilters.delete(filterId);
+        filterContainer.remove();
+        updateSparqlQuery();
+    };
+
+    
+    showAttributePanel.appendChild(deleteButton);
+    filterContainer.appendChild(showAttributePanel);
+    dpdiv.appendChild(filterContainer);
+
+    // Set up autocomplete for the new inputs
+    setupAutocomplete($('#' + showAttributeInput.id), activeTabID, '.predicate', 'predicate');
+
+    // Track this filter
+    activeFilters.add(filterId);
+    displayPropertyCount++;
+}
+
 // Update the setupFilterListener function to handle all filter types
 function setupFilterListener(activeTabID) {
     // Existing Value Filter button
@@ -496,7 +564,7 @@ function setupFilterListener(activeTabID) {
         const newButton = addDisplayPropButton.cloneNode(true);
         addDisplayPropButton.parentNode.replaceChild(newButton, addDisplayPropButton);
         newButton.addEventListener("click", () => {
-            addDisplayProperty(activeTabID);
+            addDisplayProp(activeTabID);
         });
     }
 }
@@ -686,19 +754,13 @@ function parseAutocompleteResults(data, type) {
 
 function updateQueryDisplayPropertySelectVariable(activeTabID) {
     $('.show-attribute-section-'+activeTabID).each(function() {
+        const mainpred = $(this).find('.predicate');
         const predicate = $(this).find('.predicate').next('.hidden-uri').val();
-        // const predicateObj = $(this).find('.predicate');
-        // const predicateId = predicateObj.attr('id');
-        // const numberPart = predicateId.match(/-(\d+)$/)[1];
+        const filterId = mainpred.attr('id');
+        const filterIdParts = filterId.split('-');
 
-        // Multiple filter case
-        // if (predicate) {
-        //     queryStrings[activeTab.id] += ` ?showAttributeVal${numberPart} `;
-        // }
-
-        // Single filter case
         if (predicate) {
-            queryStrings[activeTabID] += ` ?showAttributeVal `;
+            queryStrings[activeTabID] += ` ?showAttributeVal${filterIdParts[1]} `;
         }
     });
 }
@@ -757,6 +819,7 @@ function updateQueryRegexFilter(activeTabID) {
     # ... with ${valPred} matching the regular expression ${regex} ... 
     ?subject <${predicate}> ?regexValue${filterIdParts[1]} .
     FILTER(regex(?regexValue${filterIdParts[1]}, "${regex}", "i"))
+    FILTER(lang(?regexValue${filterIdParts[1]}) = "en")
             `;
         }
     });
@@ -764,25 +827,16 @@ function updateQueryRegexFilter(activeTabID) {
 
 function updateQueryDisplayPropFilter(activeTabID) {
     $('.show-attribute-section-'+activeTabID).each(function() {
+        const mainpred = $(this).find('.predicate');
         const predicate = $(this).find('.predicate').next('.hidden-uri').val();
-        // const predicateObj = $(this).find('.predicate');
-        // const predicateId = predicateObj.attr('id');
-        // const numberPart = predicateId.match(/-(\d+)$/)[1];
+        const filterId = mainpred.attr('id');
+        const filterIdParts = filterId.split('-');
 
-        // For multiple filter case
-        // if (predicate) {
-        //     query += `
-        //         # ... display the ${predicateObj} values for these entities ...
-        //         ?subject <${predicate}> ?showAttributeVal${numberPart} .
-        //     `;
-        // }
-
-        // Single filter case
         if (predicate) {
             const valPred = $(this).find('.predicate').val();
             queryStrings[activeTabID] += `
     # ... display the ${valPred} values for these entities ...
-    ?subject <${predicate}> ?showAttributeVal .
+    ?subject <${predicate}> ?showAttributeVal${filterIdParts[1]} .
             `;
         }
     });

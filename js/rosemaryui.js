@@ -538,7 +538,7 @@ function createGUI(tabPanelID) {
     showAttributeSectionPanel.classList.add('show-attribute-section-'+tabPanelID);
 
     const showAttributeLabel = document.createElement('label');
-    showAttributeLabel.textContent = 'Display Property';
+    showAttributeLabel.textContent = 'Display Properties';
 
     showAttributeLabel.appendChild(divInfoDP);
     showAttributePanel.appendChild(showAttributeLabel);
@@ -570,6 +570,16 @@ function createGUI(tabPanelID) {
     
     showAttributeSectionPanel.appendChild(inputContainerDiv);
     showAttributePanel.appendChild(showAttributeSectionPanel);
+
+    /***************** add filter for this component *******************/
+    const addDisplayPropertyContainer = document.createElement('div');
+    addDisplayPropertyContainer.classList.add('add-filter-button');
+    const addDisplayPropertyButton = document.createElement('button');
+    addDisplayPropertyButton.textContent = '+';
+    addDisplayPropertyButton.id = 'add-display-prop-' + tabPanelID;
+    addDisplayPropertyContainer.appendChild(addDisplayPropertyButton);
+    showAttributePanel.appendChild(addDisplayPropertyContainer);
+    /*******************************************************************/
 
     flexbox.appendChild(showAttributePanel);
 
