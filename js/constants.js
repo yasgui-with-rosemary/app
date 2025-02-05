@@ -17,10 +17,11 @@ const TEMPLATE_QUERIES = {
     
     # Get all entities from ${endpoint} ...
     SELECT DISTINCT ?subject`,
-    PREDICATE: (regex_str, limit, offset) => `
+    PREDICATE: (regex_str, limit, offset, type_specific_predicate_conditions) => `
     PREFIX rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#>
     PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
     SELECT DISTINCT ?predicate ?label WHERE {
+        ${type_specific_predicate_conditions}
         ?predicate a rdf:Property .
         ?predicate rdfs:label ?label .
         FILTER (lang(?label) = 'en')
@@ -33,6 +34,26 @@ const TEMPLATE_QUERIES = {
     PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
     SELECT DISTINCT ?object ?label WHERE {
         ?object rdfs:label ?label .
+        FILTER (lang(?label) = 'en')
+        FILTER(regex(?label, '${regex_str}', 'i'))
+    }
+    LIMIT ${limit}
+    OFFSET ${offset}
+    `,
+    TYPE: (regex_str, limit, offset) => `
+    PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
+    PREFIX rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#>
+    SELECT DISTINCT ?type ?label WHERE {
+        {
+            # Method 1: Explicitly declared as rdfs:Class
+            ?type rdf:type rdfs:Class.
+        }
+        UNION
+        {
+            # Method 2: Involved in rdf:type statements (used as a class)
+            ?instance rdf:type ?type.
+        }
+        ?type rdfs:label ?label .
         FILTER (lang(?label) = 'en')
         FILTER(regex(?label, '${regex_str}', 'i'))
     }

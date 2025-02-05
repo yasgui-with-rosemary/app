@@ -28,6 +28,8 @@ let tab = yasgui.getTab() || yasgui.addTab();
 let closeTabButtons = document.getElementsByClassName('closeTab');
 let activeTabPanel = document.querySelector('.tabPanel.active');
 
+let type_specific_predicate_conditions = '';
+
 function updateQueryStringList(){
     let newQueryStrings = {};
     let tabs = document.getElementsByClassName('tabPanel');
@@ -79,20 +81,23 @@ let regexFilterCount = 1;
 let displayPropertyCount = 1;
 
 function setupFilterValueChangedListenerHandler(activeTabID){
-    $(document).on('change', '.predicate, .min-val, .max-val, .regex, .object, .datatype, #limit-val-'+activeTabID, function() {
+    $(document).on('change', '.predicate, .min-val, .max-val, .regex, .object, .datatype, .type, #limit-val-'+activeTabID, function() {
         updateSparqlQuery();
         newItems = [];                                                  // Refresh dropdown items
     });
 }
 
 function setupUserTypingInFilterListenerHandler(activeTabID){
-    $(document).on('input', '.predicate, .object, #show-attribute', function() {
+    $(document).on('input', '.predicate, .object, #show-attribute, .type', function() {
         newItems = [];                                                  // Refresh dropdown items
         if ($(this).hasClass('predicate')) {
             setupAutocomplete($(this), activeTabID, '.predicate', 'predicate');
         }
         if ($(this).hasClass('object')) {
             setupAutocomplete($(this), activeTabID, '.object', 'object');
+        }
+        if ($(this).hasClass('type')) {
+            setupAutocomplete($(this), activeTabID, '.type', 'type');
         }
     });
 }
@@ -141,7 +146,6 @@ function setupRosemaryButtonPulse(activeTabID){
 // Keep track of active filters
 let activeFilters = new Set();
 
-// Modify addSearchFilter to explicitly use the active tab
 function addSearchFilter(activeTabID) {
     // Find the vfexample div within the ACTIVE tab
     const vfexample = document.querySelector(`#main-content-${activeTabID} #vfexample`);
@@ -150,8 +154,6 @@ function addSearchFilter(activeTabID) {
         return;
     }
 
-    // Create unique ID for this filter
-    // const filterId = `filter-${Date.now()}-${Math.random().toString(36)}`;
     const filterId = `vfpredicate-${filterCount}`;
     const filterObjId = `vfobject-${filterCount}`;
     
@@ -694,11 +696,14 @@ function fetchSuggestions(endpointUrl, type, term, page, callback) {
             query: buildAutocompleteQuery(type, term, CONSTANTS.SUGGESTIONS_PER_PAGE, offset),
             format: 'json'
         },
+        timeout: 0,
         success: function(data) {
             const items = parseAutocompleteResults(data, type);
             callback(items);
         },
-        error: function() {
+        error: function(jqXHR, textStatus, errorThrown) {
+            console.error('AJAX Error:', textStatus, errorThrown); // Debugging
+            console.log('Response:', jqXHR.responseText);
             callback([]);
         }
     });
@@ -736,11 +741,11 @@ function buildAutocompleteQuery(type, term, limit, offset) {
     regex_str = regex_str.replace(')', '\\\\)');
 
     if (type === 'predicate') {
-        console.log('regex1: ', regex_str);
-        return TEMPLATE_QUERIES.PREDICATE(regex_str, limit, offset);
+        return TEMPLATE_QUERIES.PREDICATE(regex_str, limit, offset, type_specific_predicate_conditions);
     } else if (type === 'object') {
-        console.log('regex2: ', regex_str);
-        return TEMPLATE_QUERIES.OBJECT(regex_str, limit, offset);;
+        return TEMPLATE_QUERIES.OBJECT(regex_str, limit, offset);
+    } else if (type === 'type') {
+        return TEMPLATE_QUERIES.TYPE(regex_str, limit, offset);
     }
 }
 
@@ -750,6 +755,31 @@ function parseAutocompleteResults(data, type) {
         label: binding.label.value,
         value: binding[type].value
     }));
+}
+
+function updateTypeFilter(activeTabID) {
+    let foundType = false;
+    $('.type-filter-'+activeTabID).each(function() {
+        const type = $(this).find('.type').next('.hidden-uri').val();
+
+        if (type) {
+            foundType = true;
+            type_specific_predicate_conditions = `
+    ?s ?predicate ?o .
+    ?s rdf:type <${type}> .
+            `;
+
+            const valType = $(this).find('.type').val();
+            queryStrings[activeTabID] += `
+
+    # ... of type ${valType} ...
+    ?subject rdf:type <${type}> .
+            `;
+        }
+    });
+    if (!foundType) {
+        type_specific_predicate_conditions = ``;
+    }
 }
 
 function updateQueryDisplayPropertySelectVariable(activeTabID) {
@@ -871,6 +901,7 @@ function updateSparqlQuery() {
 
     updateQueryDisplayPropertySelectVariable(activeTab.id);
     queryStrings[activeTab.id] += ` WHERE {`;
+    updateTypeFilter(activeTab.id);
     updateQueryValueFilter(activeTab.id);
     updateQueryValueRangeFilter(activeTab.id);
     updateQueryRegexFilter(activeTab.id);

@@ -196,6 +196,16 @@ function createGUI(tabPanelID) {
 
     divInfoLim.appendChild(spanInfoLim);
 
+    const divInfoType = document.createElement('div');
+    divInfoType.classList.add('tooltip');
+    divInfoType.textContent = 'ℹ️';
+
+    const spanInfoType = document.createElement('span');
+    spanInfoType.classList.add('tooltiptext');
+    spanInfoType.textContent = 'Enter an entity type to search for. E.g., if you are searching for persons, type `person` or films type `film`.';
+
+    divInfoType.appendChild(spanInfoType);
+
     const divInfoExamples = document.createElement('div');
     divInfoExamples.classList.add('tooltip');
     divInfoExamples.textContent = 'ℹ️';
@@ -239,13 +249,57 @@ function createGUI(tabPanelID) {
     flexbox.appendChild(rosemary_panel_logo);
     flexbox.appendChild(coverPanel);
     
+    /******************** Entity type filter *************************/
+
+    const typeCoverPanel = document.createElement('div');
+    typeCoverPanel.classList.add('attr-val-filter');
+    const typeFilterPanel = document.createElement('div');
+    typeFilterPanel.classList.add('type-filter-'+tabPanelID);
+
+    const typeFilterLabel = document.createElement('label');
+    typeFilterLabel.htmlFor = 'type-filter-'+tabPanelID;
+    typeFilterLabel.textContent = 'Entity Type';
+
+    typeFilterLabel.appendChild(divInfoType);
+    typeCoverPanel.appendChild(typeFilterLabel);
+
+    const typeInputLoaderContainerDiv = document.createElement('div');
+    typeInputLoaderContainerDiv.classList.add('input-loader-container');
+
+    const typeInput = document.createElement('input');
+    typeInput.type = 'text';
+    typeInput.classList.add('type');
+    typeInput.id = 'type-filter-'+tabPanelID;
+    typeInput.placeholder = 'Entity type (type for suggestions ...)';
+
+    const typeHiddenInput = document.createElement('input');
+    typeHiddenInput.type = 'hidden';
+    typeHiddenInput.classList.add('hidden-uri');
+
+    const typeLoaderDiv = document.createElement('div');
+    typeLoaderDiv.classList.add('loader');
+
+    const typeSpanVP = document.createElement('span');
+    typeSpanVP.classList.add('search-icon');
+    typeSpanVP.textContent = '🔍';
+
+    typeInputLoaderContainerDiv.appendChild(typeInput);
+    typeInputLoaderContainerDiv.appendChild(typeHiddenInput);
+    typeInputLoaderContainerDiv.appendChild(typeSpanVP);
+    typeInputLoaderContainerDiv.appendChild(typeLoaderDiv);
+    
+    typeFilterPanel.appendChild(typeInputLoaderContainerDiv);
+    typeCoverPanel.appendChild(typeFilterPanel);
+    
+    flexbox.appendChild(typeCoverPanel);
+    
     /************** Attribute Value Filter components ****************/
 
     const totalDiv = document.createElement('div');
     totalDiv.classList.add('attr-val-filter-vf');
 
     const attributeValueLabel = document.createElement('label');
-    attributeValueLabel.textContent = 'Value Filter';
+    attributeValueLabel.textContent = 'Properties';
 
     attributeValueLabel.appendChild(divInfoVF);
     
@@ -308,8 +362,6 @@ function createGUI(tabPanelID) {
     searchFilterDiv.appendChild(objInputLoaderContainerDiv);
     totalDiv.appendChild(searchFilterDiv);
 
-    // flexbox.appendChild(totalDiv);
-
     /********************* Examples dropdown component *********************/
 
     const examplesDropdownLabel = document.createElement('label');
@@ -365,7 +417,7 @@ function createGUI(tabPanelID) {
 
     attributeValueRangeFilterPanel.classList.add('attr-val-filter');
     const attributeValueRangeFilterlabel = document.createElement('label');
-    attributeValueRangeFilterlabel.textContent = "Value Range Filter";
+    attributeValueRangeFilterlabel.textContent = "Value Range";
     
     attributeValueRangeFilterlabel.appendChild(divInfoVRF);
     attributeValueRangeFilterPanel.appendChild(attributeValueRangeFilterlabel);
@@ -457,7 +509,6 @@ function createGUI(tabPanelID) {
     addValueRangeFilterButton.id = 'add-vrange-filter-'+tabPanelID;
     addValueRangeFilterContainer.appendChild(addValueRangeFilterButton);
     attributeValueRangeFilterPanel.appendChild(addValueRangeFilterContainer);
-    // flexbox.appendChild(addValueRangeFilterContainer);
     /*******************************************************************/
 
     flexbox.appendChild(attributeValueRangeFilterPanel);
@@ -470,7 +521,7 @@ function createGUI(tabPanelID) {
 
     stringMatchFilterPanel.classList.add('attr-val-filter');
     const stringMatchFilterLabel = document.createElement('label');
-    stringMatchFilterLabel.textContent = "String Match Filter";
+    stringMatchFilterLabel.textContent = "String Match";
 
     stringMatchFilterLabel.appendChild(divInfoSMF);
     stringMatchFilterPanel.appendChild(stringMatchFilterLabel);
@@ -524,7 +575,6 @@ function createGUI(tabPanelID) {
     addRegexFilterButton.id = 'add-smatch-filter-'+tabPanelID;
     addRegexFilterContainer.appendChild(addRegexFilterButton);
     stringMatchFilterPanel.appendChild(addRegexFilterContainer);
-    // flexbox.appendChild(addValueRangeFilterContainer);
     /*******************************************************************/
 
     flexbox.appendChild(stringMatchFilterPanel);
