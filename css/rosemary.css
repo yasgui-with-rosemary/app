@@ -155,6 +155,12 @@ label {
     padding-right: 40px;    
 }
 
+.type input {
+    flex: 1;
+    display: flex;
+    padding-right: 40px;    
+}
+
 .flex-1{
     flex: 1;
 }
