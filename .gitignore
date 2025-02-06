@@ -3,6 +3,5 @@ node_modules/
 cypress/fixtures/
 cypress/downloads/
 cypress/screenshots/
-cypress/support/commands.js
 cypress/e2e/1-getting-started/
 cypress/e2e/2-advanced-examples/
