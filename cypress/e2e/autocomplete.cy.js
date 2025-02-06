@@ -1,13 +1,7 @@
 describe('Rosemary Autocompletion Unit Test', () => {
   beforeEach(() => {
-    // Visit the index.html page directly
-    cy.visit('/'); // Since baseUrl is set, this points to http://localhost:8080/index.html
-    cy.get('.tabPanel.active')      // Select the active tab panel
-      .invoke('attr', 'id')         // Get the 'id' attribute
-      .then((id) => {
-        expect(id).to.exist;
-        cy.get('#rosemaryButton-' + id).first().click(); // Click to open rosemary panel
-      });
+    cy.visit('/'); // Visit the index.html page directly (in the root of the project)
+    cy.openRosemary(); // Click the Rosemary button to open the filter panel in Yasgui (UI)
   });
 
   it('fetch suggestions via AJAX, select one and update DOM with URI', () => {
