@@ -1,0 +1,39 @@
+{
+  "name": "rosemary",
+  "version": "1.0.0",
+  "description": "[![DOI](https://zenodo.org/badge/914423135.svg)](https://doi.org/10.5281/zenodo.14624851) [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT) [![RSD](https://img.shields.io/badge/rsd-grlc_sustainability-blue.svg)](https://research-software-directory.org/projects/enhancing-the-sustainability-of-grlc) [![cffconvert](https://github.com/yasgui-with-rosemary/app/actions/workflows/cffconvert.yml/badge.svg)](https://github.com/yasgui-with-rosemary/app/actions/workflows/cffconvert.yml)",
+  "main": "index.js",
+  "directories": {
+    "test": "cypress/e2e"
+  },
+  "scripts": {
+    "test": "cypress run",
+    "cy:open": "cypress open",
+    "cy:autocomplete": "cypress run --spec 'cypress/e2e/autocomplete.cy.js'"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/yasgui-with-rosemary/app.git"
+  },
+  "keywords": [
+    "Yasgui",
+    "SPARQL",
+    "Faceted Search",
+    "Query",
+    "RDF",
+    "Linked Data",
+    "Autocompletion"
+  ],
+  "author": "Kody Moodley",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/yasgui-with-rosemary/app/issues"
+  },
+  "homepage": "https://github.com/yasgui-with-rosemary/app#readme",
+  "devDependencies": {
+    "cypress": "^14.0.2"
+  },
+  "dependencies": {
+    "jquery": "^3.7.1"
+  }
+}
