@@ -202,7 +202,7 @@ function createGUI(tabPanelID) {
 
     const spanInfoType = document.createElement('span');
     spanInfoType.classList.add('tooltiptext');
-    spanInfoType.textContent = 'Enter an entity type to search for. E.g., if you are searching for persons, type `person` or films type `film`.';
+    spanInfoType.textContent = 'Enter an entity type to search for. E.g., if you are searching for persons, type `person` or companies type `company`.';
 
     divInfoType.appendChild(spanInfoType);
 
