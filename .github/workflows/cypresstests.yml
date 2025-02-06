@@ -26,6 +26,11 @@ jobs:
       - name: Install Dependencies
         run: npm install
 
+      - name: Start Local Server
+        run: |
+          npx http-server -p 8080 -c-1 &
+        working-directory: . # Start server from repo root (no caching)
+
       - name: Run Cypress Tests
         uses: cypress-io/github-action@v5
         with:
