@@ -40,35 +40,35 @@
 \* rosemary runs in the browser so you can also run it locally without Docker by opening [index.html](https://github.com/yasgui-with-rosemary/app/blob/main/index.html) in your browser ([Chrome](https://www.google.com/chrome/) **recommended**)
 
 ### Testing (requires [Cypress](https://www.npmjs.com/package/cypress))
-
+---
 Rosemary makes use of End-to-End testing implemented in [Cypress](https://www.npmjs.com/package/cypress). Ensure you have it installed:
 
----
+
     npm install cypress --save-dev
----
+
 
 Since Cypress accesses applications over HTTP, you need to install and run a local HTTP server before running the tests. First install such a server, e.g. [http-server](https://www.npmjs.com/package/http-server):
 
----
+
     npm install -g http-server
----
+
 
 Then, run it:
 
----
+
     http-server -p 8080
----
+
 
 In another terminal tab or window, you can run the Rosemary Cypress tests with the command:
 
----
     npx cypress run --spec "cypress/e2e/autocomplete.cy.js"
 
 ### Scope
-Rosemary is a proof of concept. It does not support the full expressivity of SPARQL (only a restricted subset of [SELECT](https://www.w3.org/TR/sparql11-query/#select) queries) and that is not the intention. It is a tool which can be useful to developers and researchers **unfamiliar with Linked Data technologies** for:
+Rosemary is a proof of concept. It does not support the full expressivity of SPARQL (only a restricted subset of [SELECT](https://www.w3.org/TR/sparql11-query/#select) queries) and that is not the intention. It is a tool which can be useful to developers, researchers and students **unfamiliar with Linked Data technologies** for:
 
 1. discovering and exploring what data is in a **public** Linked Data store,
-2. constructing custom Linked Data queries to retrieve data for:
+2. learning fundamentals of SPARQL syntax,
+3. constructing custom Linked Data queries to retrieve data for:
    1. software applications
    2. data analyses
    3. research projects
