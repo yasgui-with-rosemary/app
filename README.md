@@ -64,6 +64,7 @@ In another terminal tab or window, you can run the Rosemary Cypress tests with t
     npx cypress run --spec "cypress/e2e/autocomplete.cy.js"
 
 ### Scope
+---
 Rosemary is a proof of concept. It does not support the full expressivity of SPARQL (only a restricted subset of [SELECT](https://www.w3.org/TR/sparql11-query/#select) queries) and that is not the intention. It is a tool which can be useful to developers, researchers and students **unfamiliar with Linked Data technologies** for:
 
 1. discovering and exploring what data is in a **public** Linked Data store,
