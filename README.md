@@ -1,7 +1,7 @@
 
 
 # Rosemary
-[![DOI](https://zenodo.org/badge/914423135.svg)](https://doi.org/10.5281/zenodo.14624851) [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT) [![RSD](https://img.shields.io/badge/rsd-grlc_sustainability-blue.svg)](https://research-software-directory.org/projects/enhancing-the-sustainability-of-grlc) [![cffconvert](https://github.com/yasgui-with-rosemary/app/actions/workflows/cffconvert.yml/badge.svg)](https://github.com/yasgui-with-rosemary/app/actions/workflows/cffconvert.yml)
+[![DOI](https://img.shields.io/badge/DOI-10.5281%2Fzenodo.14624851-blue)](https://doi.org/10.5281/zenodo.14624851) [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT) [![RSD](https://img.shields.io/badge/rsd-grlc_sustainability-blue.svg)](https://research-software-directory.org/projects/enhancing-the-sustainability-of-grlc) [![cffconvert](https://github.com/yasgui-with-rosemary/app/actions/workflows/cffconvert.yml/badge.svg)](https://github.com/yasgui-with-rosemary/app/actions/workflows/cffconvert.yml)
 
 <div align="center">
 <img src="img/rosemary-logo-v1.png" alt="rosemary logo" height="250">
