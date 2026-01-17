@@ -64,11 +64,11 @@ const TEMPLATE_QUERIES = {
 
 const EXAMPLE_QUERIES = {
     'example1' : {
-        TITLE: 'DBpedia: Born in Calcutta ...',
+        TITLE: 'DBpedia: Born in Kolkata ...',
         VF_PREDICATE: 'birthPlace',
         VF_PREDICATE_HIDDEN: 'http://dbpedia.org/ontology/birthPlace',
-        VF_OBJECT: 'Calcutta',
-        VF_OBJECT_HIDDEN: 'http://dbpedia.org/resource/Calcutta',
+        VF_OBJECT: 'Kolkata',
+        VF_OBJECT_HIDDEN: 'http://dbpedia.org/resource/Kolkata',
         VRF_PREDICATE: 'birthDate',
         VRF_PREDICATE_HIDDEN: 'http://dbpedia.org/ontology/birthDate',
         VRF_MIN: '1900-01-01',
@@ -88,8 +88,8 @@ const EXAMPLE_QUERIES = {
     # Get all entities from https://dbpedia.org/sparql ... 
     SELECT ?subject ?showAttributeVal WHERE { 
     
-    # ... with Calcutta as value for birth place ... 
-    ?subject <http://dbpedia.org/ontology/birthPlace> <http://dbpedia.org/resource/Calcutta> . 
+    # ... with Kolkata as value for birth place ... 
+    ?subject <http://dbpedia.org/ontology/birthPlace> <http://dbpedia.org/resource/Kolkata> . 
     
     # ... with birth date between 1900-01-01 and 1945-01-01 ... 
     ?subject <http://dbpedia.org/ontology/birthDate> ?value . 
@@ -106,7 +106,7 @@ const EXAMPLE_QUERIES = {
     
     LIMIT 20 # Return max 20 results
         `,
-        DESC: 'People born in Calcutta between 1900-01-01 and 1945-01-01 whose names start with S and their spouses'
+        DESC: 'People born in Kolkata between 1900-01-01 and 1945-01-01 whose names start with S and their spouses'
     },
 
     'example2' : {
@@ -120,9 +120,9 @@ const EXAMPLE_QUERIES = {
         VRF_MIN: '100',
         VRF_MAX: '400',
         DTYPE: 'xsd:integer',
-        SMF_PREDICATE: 'has abstract',
-        SMF_PREDICATE_HIDDEN: 'http://dbpedia.org/ontology/abstract',
-        SMF_REGEX: 'adapt',
+        SMF_PREDICATE: 'description',
+        SMF_PREDICATE_HIDDEN: 'http://dbpedia.org/ontology/description',
+        SMF_REGEX: 'child',
         DP_PREDICATE: 'publisher',
         DP_PREDICATE_HIDDEN: 'http://dbpedia.org/property/publisher',
         LIMIT: '100',
@@ -141,9 +141,9 @@ const EXAMPLE_QUERIES = {
     ?subject <http://dbpedia.org/property/pages> ?value . 
     FILTER(?value >= "100"^^xsd:integer && ?value <= "400"^^xsd:integer) 
     
-    # ... with has abstract matching the regular expression adapt ... 
-    ?subject <http://dbpedia.org/ontology/abstract> ?regexValue . 
-    FILTER(regex(?regexValue, "adapt", "i")) 
+    # ... with description matching the regular expression child ... 
+    ?subject <http://dbpedia.org/ontology/description> ?regexValue . 
+    FILTER(regex(?regexValue, "child", "i")) 
     
     # ... display the values for these entities ... 
     ?subject <http://dbpedia.org/property/publisher> ?showAttributeVal . 
@@ -152,7 +152,7 @@ const EXAMPLE_QUERIES = {
     
     LIMIT 100 # Return max 100 results
         `,
-        DESC: 'Books by Roald Dahl that are between 100 and 400 pages long that have been adapted as a film or theatre production (the description of the book should contain the word `adapt` in it somewhere indicating a film or theatre adaptation), display also the publishers of these books.'
+        DESC: 'Books by Roald Dahl that are between 100 and 400 pages long that have the word `child` in it, potentially indicating a children`s book.'
     },
 
     'example3' : {
@@ -166,9 +166,9 @@ const EXAMPLE_QUERIES = {
         VRF_MIN: '0',
         VRF_MAX: '6000',
         DTYPE: 'xsd:double',
-        SMF_PREDICATE: 'has abstract',
-        SMF_PREDICATE_HIDDEN: 'http://dbpedia.org/ontology/abstract',
-        SMF_REGEX: 'Oscar',
+        SMF_PREDICATE: 'description',
+        SMF_PREDICATE_HIDDEN: 'http://dbpedia.org/ontology/description',
+        SMF_REGEX: '1983',
         DP_PREDICATE: 'film director',
         DP_PREDICATE_HIDDEN: 'http://dbpedia.org/ontology/director',
         LIMIT: '100',
@@ -187,9 +187,9 @@ const EXAMPLE_QUERIES = {
     ?subject <http://dbpedia.org/ontology/runtime> ?value .
     FILTER(?value >= "0"^^xsd:double && ?value <= "6000"^^xsd:double)
     
-    # ... with has abstract matching the regular expression Oscar ... 
-    ?subject <http://dbpedia.org/ontology/abstract> ?regexValue .
-    FILTER(regex(?regexValue, "Oscar", "i"))
+    # ... with description matching the regular expression 1983 ... 
+    ?subject <http://dbpedia.org/ontology/description> ?regexValue .
+    FILTER(regex(?regexValue, "1983", "i"))
     
     # ... display the film director values for these entities ...
     ?subject <http://dbpedia.org/ontology/director> ?showAttributeVal .
@@ -198,7 +198,7 @@ const EXAMPLE_QUERIES = {
 
     LIMIT 100 # Return max 100 results
         `,
-        DESC: 'Short movies (less than 100 minutes long) starring Tom Cruise that have been associated with Oscars, also display their directors'
+        DESC: 'Short movies (less than 100 minutes long) starring Tom Cruise that have `1983` in the description of the movie (potentially made in that year), also display their directors.'
     }
 }
   
